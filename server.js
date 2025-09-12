@@ -85,8 +85,10 @@ app.post("/chat", async (req, res) => {
             systemInstruction: `You are a Kerala Agriculture Expert.
 You will be given a context of relevant information and a user question.
 Your task is to answer the user's question based ONLY on the provided context.
-If the answer is not in the context, you must say "Please contact to nearest Krishi Bhavan".
-Keep your answers clear, concise, and educational.
+
+If the knowledge base context is missing or incomplete,  
+still provide **general best practices** and politely ask a follow-up question  
+to better guide the farmer.
 
 IMPORTANT:
 - Detect the language of the question first.
