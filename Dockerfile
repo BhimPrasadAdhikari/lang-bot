@@ -1,18 +1,21 @@
-# Use Node.js 20 (required for Google GenAI SDK)
-FROM node:20
+# Use Node.js LTS
+FROM node:20-slim
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files
 COPY package*.json ./
+
+# Install dependencies (use --only=production for smaller image if you don’t need dev deps)
 RUN npm install --omit=dev
 
-# Copy rest of the code
+# Copy all project files
 COPY . .
 
-# Expose the port
+# Expose the port Cloud Run will use
+ENV PORT=8080
 EXPOSE 8080
 
-# Start the server
-CMD ["npm", "start"]
+# Start the app
+CMD ["node", "server.js"]
