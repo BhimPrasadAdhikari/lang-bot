@@ -13,7 +13,7 @@ app.use(express.json());
 
 // --- Initialize AI ---
 const ai = new GoogleGenAI({});
-const History = []
+let memory = []
 
 /**
  * Transform user query into a standalone question
@@ -22,19 +22,23 @@ const History = []
  */
 async function transformQuery(question) {
   
-    History.push({ role: "user", parts: [{ text: question }] })
+    memory.push({ role: "user", content: question });
   
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
-    contents: History,
+    contents: memory.map(m => ({
+      role: m.role,
+      parts: [{text: m.content}]
+    })),
     config: {
-      systemInstruction: `You are a query rewriting expert. Based on the provided chat history, rephrase the "Follow Up user Question" into a complete, standalone question that can be understood without the chat history.
-Only output the rewritten question and nothing else.`,
+      systemInstruction: `You are a query rewriting expert. 
+Based on the conversation history, rephrase the latest user question into a complete, 
+standalone question that can be understood without chat history.
+
+Output only the rewritten question.`,
     },
   });
-
-  History.pop()
 
   return response.text;
 }
@@ -76,16 +80,18 @@ app.post("/chat", async (req, res) => {
       .filter(Boolean)
       .join("\n\n---\n\n") || "No relevant context found.";
 
-    // Step 4: Generate response from Gemini
-    const localHistory = [
-      { role: "user", parts: [{ text: rewrittenQuestion }] }
-    ];
-
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: localHistory,
+      contents: [
+        ...memory.map(m => ({
+          role: m.role,
+          parts: [{ text: m.content }]
+        })),
+        { role: "user", parts: [{ text: rewrittenQuestion }] }
+      ],
+
       config: {
-            systemInstruction: `You are a Kerala Agriculture Expert.
+            systemInstruction: `You are a Agriculture Expert.
 You will be given a context of relevant information and a user question.
 Your task is to answer the user's question based ONLY on the provided context.
 
@@ -93,16 +99,17 @@ If the knowledge base context is missing or incomplete,
 still provide **general best practices** and politely ask a follow-up question  
 to better guide the farmer.
 
-IMPORTANT:
-- Detect the language of the question first.
-- If the question is in English, reply ONLY in English.
-- If the question is in Malayalam, reply ONLY in Malayalam.
-- Do NOT mix languages.
+IMPORTANT:  
+- First, detect the language of the user’s question.  
+- Reply strictly in the same language as the user (English → English, Malayalam → Malayalam, Hindi → Hindi, Nepali → Nepali, etc.).  
+- Do NOT mix languages.  
 
 Context:
 ${context}`,
       },
     });
+
+    memory.push({role: "model", content:response.text})
 
     return res.json({ answer: response.text });
   } catch (error) {
