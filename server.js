@@ -13,6 +13,7 @@ app.use(express.json());
 
 // --- Initialize AI ---
 const ai = new GoogleGenAI({});
+const History = []
 
 /**
  * Transform user query into a standalone question
@@ -20,18 +21,20 @@ const ai = new GoogleGenAI({});
  * @returns {Promise<string>} rewritten question
  */
 async function transformQuery(question) {
-  const history = [
-    { role: "user", parts: [{ text: question }] }
-  ];
+  
+    History.push({ role: "user", parts: [{ text: question }] })
+  
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
-    contents: history,
+    contents: History,
     config: {
       systemInstruction: `You are a query rewriting expert. Based on the provided chat history, rephrase the "Follow Up user Question" into a complete, standalone question that can be understood without the chat history.
 Only output the rewritten question and nothing else.`,
     },
   });
+
+  History.pop()
 
   return response.text;
 }
