@@ -56,6 +56,19 @@ app.post("/chat", async (req, res) => {
 
   try {
     // Step 1: Rewrite question
+    const crisisKeywords = ["suicide", "ആത്മഹത്യ", "आत्महत्या", "आत्महत्या करना", "kill myself"];
+    if (crisisKeywords.some(k => question.toLowerCase().includes(k))) {
+      return res.json({
+        answer: `⚠️ I’m really concerned about what you just shared.  
+If you are in immediate danger, please call your local emergency number right now.  
+
+📞 India: Call 1800-599-0019 (Vandrevala Foundation) or 9152987821 (AASRA Helpline)  
+📞 International: Visit https://findahelpline.com for crisis hotlines worldwide.  
+
+You are not alone. Please reach out to someone you trust or a professional right away.`
+      });
+    }
+
     const rewrittenQuestion = await transformQuery(question);
 
     // Step 2: Generate embedding vector
