@@ -43,10 +43,7 @@ Output only the rewritten question.`,
   return response.text;
 }
 
-/**
- * Chatbot endpoint: takes a question, retrieves context from Pinecone,
- * and generates a Gemini response.
- */
+
 app.post("/chat", async (req, res) => {
   const question = req.body?.question?.trim();
 
