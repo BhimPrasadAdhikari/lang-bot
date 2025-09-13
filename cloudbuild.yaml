@@ -3,7 +3,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args: [
       "build", "-t",
-      "us-central1-docker.pkg.dev/bubbly-upgrade-441904-p6/langbot-repo/langbot-backend-service:$COMMIT_SHA",
+      "us-central1-docker.pkg.dev/teak-cyclist-472004-q7/langbot-repo/langbot-backend-service:$COMMIT_SHA",
       "."
     ]
 
@@ -11,7 +11,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args: [
       "push",
-      "us-central1-docker.pkg.dev/bubbly-upgrade-441904-p6/langbot-repo/langbot-backend-service:$COMMIT_SHA"
+      "us-central1-docker.pkg.dev/teak-cyclist-472004-q7/langbot-repo/langbot-backend-service:$COMMIT_SHA"
     ]
 
   # 3. Deploy to Cloud Run
@@ -20,17 +20,17 @@ steps:
     args:
       [
         "run", "deploy", "langbot-backend-service",
-        "--image=us-central1-docker.pkg.dev/bubbly-upgrade-441904-p6/langbot-repo/langbot-backend-service:$COMMIT_SHA",
+        "--image=us-central1-docker.pkg.dev/teak-cyclist-472004-q7/langbot-repo/langbot-backend-service:$COMMIT_SHA",
         "--region=us-central1",
         "--platform=managed",
         "--allow-unauthenticated",
-        "--service-account=chatbot-run-identity@bubbly-upgrade-441904-p6.iam.gserviceaccount.com",
+        "--service-account=chatbot-run-identity@teak-cyclist-472004-q7.iam.gserviceaccount.com",
         "--memory=1Gi",
         "--timeout=300s"
       ]
 
 images:
-  - "us-central1-docker.pkg.dev/bubbly-upgrade-441904-p6/langbot-repo/langbot-backend-service:$COMMIT_SHA"
+  - "us-central1-docker.pkg.dev/teak-cyclist-472004-q7/langbot-repo/langbot-backend-service:$COMMIT_SHA"
 
 options:
   logging: CLOUD_LOGGING_ONLY
