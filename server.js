@@ -91,7 +91,7 @@ You are not alone. Please reach out to someone you trust or a professional right
       .join("\n\n---\n\n") || "No relevant context found.";
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       contents: [
         ...memory.map(m => ({
           role: m.role,
