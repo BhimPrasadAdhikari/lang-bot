@@ -8,7 +8,10 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { GoogleGenAI } from "@google/genai";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://chatbot-frontend-fawn-ten.vercel.app",
+  methods: ["GET", "POST"],
+}));
 app.use(express.json());
 
 // --- Initialize AI ---
